@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Smart Page Analyzer Settings</title>
+  <link rel="stylesheet" href="/src/options/options.css">
+</head>
+<body>
+  <div class="settings-container">
+    <h1>Extension Settings</h1>
+    <div class="description">
+      Your API key is used to authenticate requests to the OpenAI API. Rest assured, this extension does not store or share your API key with any third parties.
+    </div>
+    
+    <div class="settings-section">
+      <h2>API Configuration</h2>
+      <div class="form-group">
+        <label for="apiKey">OpenAI API Key</label>
+        <input type="password" id="apiKey" placeholder="sk-...">
+        <div class="hint">Enter your OpenAI API key. Get one from: <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI API Keys</a></div>
+      </div>
+
+      <div class="form-group">
+        <label for="model">AI Model</label>
+        <select id="model">
+          <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h2>Content Settings</h2>
+      <div class="form-group">
+        <label for="maxLength">Maximum Content Length</label>
+        <input type="number" id="maxLength" value="4000">
+        <div class="hint">Maximum number of characters to send to the AI (default: 4000)</div>
+      </div>
+    </div>
+
+    <button id="save">Save Settings</button>
+    <div id="status"></div>
+  </div>
+
+  <script type="module" src="/src/options/options.js"></script>
+</body>
+</html> 
