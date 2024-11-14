@@ -42,8 +42,3 @@ The extension uses OpenAI's GPT-3.5-turbo model. Approximate costs per operation
 - Extract Tables: ~$0.001-0.002 depending on table size
 
 Note: These are estimates based on OpenAI's pricing of $0.001 per 1K input tokens and $0.002 per 1K output tokens. Actual costs may vary depending on content length and complexity.
-
-## Technical Details
-- Uses Manifest V3
-- Implements async/await patterns for API communication
-- Employs MutationObserver for dynamic content handling
