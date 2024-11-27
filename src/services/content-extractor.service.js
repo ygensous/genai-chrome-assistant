@@ -1,14 +1,7 @@
 class ContentExtractorService {
   extractMainContent() {
-    // Clone the document body to avoid modifying the actual page
-    const contentClone = document.body.cloneNode(true);
-    
-    // Remove unwanted elements from the clone
-    const elementsToRemove = contentClone.querySelectorAll('header, footer, nav, aside, script, style, iframe');
-    elementsToRemove.forEach(el => el.remove());
-
-    // Find main content in the clone
-    const mainContent = contentClone.querySelector('main, article, .main-content') || contentClone;
+    // Create a non-modifying copy of the elements we need
+    const mainContent = document.querySelector('main, article, .main-content') || document.body;
     
     return {
       text: this.extractText(mainContent),
@@ -18,10 +11,12 @@ class ContentExtractorService {
   }
 
   extractText(element) {
+    // Only read the text content
     return element.innerText;
   }
 
   extractTables(element) {
+    // Only read table content
     return Array.from(element.querySelectorAll('table')).map(table => ({
       headers: Array.from(table.querySelectorAll('th')).map(th => th.textContent.trim()),
       rows: Array.from(table.querySelectorAll('tr')).map(row => 
@@ -32,6 +27,7 @@ class ContentExtractorService {
   }
 
   extractLinks(element) {
+    // Only read link information
     return Array.from(element.querySelectorAll('a'))
       .map(link => ({
         text: link.innerText.trim(),

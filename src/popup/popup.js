@@ -1,7 +1,7 @@
 import { OpenAIService } from '../services/openai.service.js';
 import { StorageService } from '../services/storage.service.js';
 import { truncateContent, formatTableData } from '../utils/helpers.js';
-import { APIError, ContentExtractionError } from '../utils/errors.js';
+import { APIError } from '../utils/errors.js';
 
 const storageService = new StorageService();
 let openAIService;
@@ -30,10 +30,45 @@ async function handleSummarize(content, settings) {
   if (!content.text || content.text.trim().length === 0) {
     throw new Error('No text content found on this page');
   }
-  return await openAIService.analyze(
-    'Summarize this text in 3 sentences:',
+  
+  const prompt = `
+Please analyze and summarize this content in a structured format:
+
+1. Main Points (2-3 bullet points)
+2. Key Details (if any)
+3. Context & Significance
+4. Notable Quotes (if any)
+
+Format the response with markdown-style headings using ### for sections.
+Use bullet points for lists.
+Put quotes in blockquote format using >.`;
+
+  const aiResponse = await openAIService.analyze(
+    prompt,
     truncateContent(content.text, settings.maxLength)
   );
+
+  // Convert markdown-style response to HTML
+  const formattedResponse = aiResponse
+    // Convert sections
+    .replace(/###\s+(.*)/g, '<h3>$1</h3><section>')
+    // Close sections
+    .split('<h3>')
+    .join('</section><h3>')
+    // Remove extra section tags
+    .replace('<section></section>', '')
+    // Convert bullet points
+    .replace(/^\s*[-•]\s+(.+)$/gm, '<li>$1</li>')
+    // Wrap lists
+    .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>')
+    // Convert blockquotes
+    .replace(/^\s*>\s+(.+)$/gm, '<blockquote>$1</blockquote>');
+
+  return `
+    <div class="summary-result">
+      ${formattedResponse}
+    </div>
+  `;
 }
 
 async function handleLinkExtraction(content, settings) {
@@ -86,25 +121,6 @@ async function handleTableExtraction(content) {
   `;
 }
 
-// Add this utility function at the top with other utility functions
-async function ensureContentScriptsInjected(tabId) {
-  return chrome.scripting.executeScript({
-    target: { tabId },
-    func: () => window.contentScriptInitialized === true,
-  }).then(async (result) => {
-    // If scripts aren't initialized, inject them
-    if (!result[0]?.result) {
-      await chrome.scripting.executeScript({
-        target: { tabId },
-        files: [
-          '/src/services/content-extractor.service.js',
-          '/src/scripts/content.js'
-        ]
-      });
-    }
-  });
-}
-
 // Main action handler
 async function handleAction(actionType) {
   const loader = document.querySelector('.loader');
@@ -119,32 +135,21 @@ async function handleAction(actionType) {
       throw new Error('No active tab found');
     }
 
-    // Extract content from the page
-    await ensureContentScriptsInjected(tab.id);
-    const content = await chrome.tabs.sendMessage(tab.id, { action: 'getContent' });
-    
-    if (chrome.runtime.lastError) {
-      throw new Error(chrome.runtime.lastError.message);
-    }
+    const content = await sendMessageWithRetry(tab, { action: 'getContent' });
     
     if (content && content.error) {
       throw new Error(content.error);
     }
 
-    // Load settings
     const settings = await storageService.getSettings();
+    if (!settings.apiKey) {
+      throw new Error('Please set your OpenAI API key in the extension options.');
+    }
     
-    // Handle the actions
     let result;
     switch (actionType) {
       case 'summarize':
         result = await handleSummarize(content, settings);
-        break;
-      case 'extractLinks':
-        result = await handleLinkExtraction(content, settings);
-        break;
-      case 'extractData':
-        result = await handleTableExtraction(content);
         break;
       default:
         throw new Error('Unknown action type');
@@ -153,9 +158,16 @@ async function handleAction(actionType) {
     resultDiv.innerHTML = result;
   } catch (error) {
     console.error('Error in handleAction:', error);
+    let errorMessage = error.message;
+    
+    // Add a helpful message for API key errors
+    if (errorMessage.includes('API key')) {
+      errorMessage += ' Click the extension icon with right mouse button and select "Options" to set your API key.';
+    }
+    
     resultDiv.innerHTML = `
       <div class="error-message">
-        ${error.message}
+        ${errorMessage}
       </div>
     `;
   } finally {
@@ -180,6 +192,8 @@ document.addEventListener('DOMContentLoaded', () => {
     handleAction('summarize');
   });
   
+  // Other button listeners commented out for later use
+  /*
   document.getElementById('extractLinks').addEventListener('click', (e) => {
     setActiveButton(e.currentTarget);
     handleAction('extractLinks');
@@ -189,4 +203,27 @@ document.addEventListener('DOMContentLoaded', () => {
     setActiveButton(e.currentTarget);
     handleAction('extractData');
   });
-}); 
+  */
+});
+
+async function sendMessageWithRetry(tab, message, maxAttempts = 3) {
+  // First attempt - try to send message
+  try {
+    return await chrome.tabs.sendMessage(tab.id, message);
+  } catch (error) {
+    console.log('Initial message failed, reloading tab...');
+    
+    // If failed, reload the tab and try again
+    await chrome.tabs.reload(tab.id);
+    
+    // Wait for the page to load
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Try one more time after reload
+    try {
+      return await chrome.tabs.sendMessage(tab.id, message);
+    } catch (error) {
+      throw new Error('Could not connect to the page. Please try again.');
+    }
+  }
+} 

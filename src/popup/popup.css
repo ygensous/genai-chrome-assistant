@@ -21,14 +21,12 @@ h1 {
 }
 
 .button-group {
-  display: flex;
-  gap: 8px;
   margin-bottom: 16px;
 }
 
 .btn {
-  flex: 1;
-  padding: 10px 12px;
+  width: 100%;
+  padding: 12px 20px;
   background-color: var(--primary-color);
   color: white;
   border: none;
@@ -41,11 +39,14 @@ h1 {
 
 .btn:hover {
   background-color: #1976D2;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .btn.active {
   background-color: #1565C0;
   box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+  transform: translateY(1px);
 }
 
 .btn.active::after {
@@ -106,11 +107,18 @@ h1 {
 .error-message {
   background-color: #ffebee;
   color: var(--error-color);
-  padding: 12px;
+  padding: 12px 16px;
   border-radius: 4px;
   border-left: 4px solid var(--error-color);
   margin: 8px 0;
-  font-size: 15px;
+  font-size: 14px;
+}
+
+.error-hint {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #666;
+  font-style: italic;
 }
 
 .result-container.loading #content {
@@ -150,4 +158,54 @@ a:hover {
 
 .table-analysis li {
   margin-bottom: 10px;
+}
+
+/* Summary results styling */
+.summary-result {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-color);
+}
+
+.summary-result h3 {
+  color: var(--primary-color);
+  font-size: 16px;
+  margin: 16px 0 8px 0;
+  padding-bottom: 4px;
+  border-bottom: 2px solid #e3f2fd;  /* Light blue border */
+}
+
+.summary-result h3:first-child {
+  margin-top: 0;
+}
+
+.summary-result ul {
+  margin: 8px 0;
+  padding-left: 20px;
+}
+
+.summary-result li {
+  margin-bottom: 8px;
+  position: relative;
+}
+
+.summary-result blockquote {
+  margin: 12px 0;
+  padding: 8px 16px;
+  border-left: 4px solid var(--primary-color);
+  background-color: #f5f5f5;
+  font-style: italic;
+}
+
+/* Add some spacing between sections */
+.summary-result section {
+  margin-bottom: 16px;
+}
+
+/* Style for the content container */
+#content {
+  background: white;
+  border-radius: 4px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
