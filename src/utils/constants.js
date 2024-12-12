@@ -5,7 +5,7 @@ export const API_ENDPOINTS = {
 export const DEFAULT_SETTINGS = {
   API_KEY: '',
   MODEL: 'gpt-3.5-turbo',
-  MAX_LENGTH: 4000
+  MAX_LENGTH: 10000
 };
 
 export const MUTATION_OBSERVER_CONFIG = {
