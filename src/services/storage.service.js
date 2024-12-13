@@ -47,13 +47,19 @@ Put quotes in blockquote format using.`,
       `,
       urlPattern: 'https://docs.google.com/presentation/*'
     },{
-      label: 'Generate positive answer',
+      label: 'Suggest answer',
+      prompt: `
+      This is a gmail page. Suggest an answer to the email, in the language of the original email.
+      `,
+      urlPattern: 'https://mail.google.com/*'
+    },{
+      label: 'Suggest positive',
       prompt: `
       This is a gmail page. Generate a positive answer to the email, in the language of the original email.
       `,
       urlPattern: 'https://mail.google.com/*'
     },{
-      label: 'Generate negative answer',
+      label: 'Suggest negative',
       prompt: `
       This is a gmail page. Generate a negative answer to the email, in the language of the original email.
       `,
