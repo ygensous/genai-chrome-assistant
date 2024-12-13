@@ -50,6 +50,13 @@ Put quotes in blockquote format using.`,
       label: 'Suggest answer',
       prompt: `
       This is a gmail page. Suggest an answer to the email, in the language of the original email.
+      For context, I am yann.gensous@gmail.com
+      `,
+      urlPattern: 'https://mail.google.com/*'
+    },{
+      label: 'Ask for update',
+      prompt: `
+      This is a gmail page. Suggest a message to ask for updates, in the language of the original email.
       `,
       urlPattern: 'https://mail.google.com/*'
     },{
@@ -70,7 +77,7 @@ Put quotes in blockquote format using.`,
   async getSettings() {
     return new Promise((resolve) => {
       chrome.storage.sync.get(
-        ['apiKey', 'model', 'maxLength', 'customPrompts'],
+        ['apiKey', 'model', 'maxLength', 'customPrompts', 'systemMessage'],
         (result) => {
           // Initialize customPrompts with default if not set
           if (!result.customPrompts) {

@@ -9,6 +9,7 @@ class PanelController {
         this.openAIService = null;
         this.maxLength = DEFAULT_SETTINGS.MAX_LENGTH;
         this.currentUrl = '';
+        this.systemMessage = '';
         
         this.elements = {
             promptButtons: document.getElementById('prompt-buttons'),
@@ -27,6 +28,7 @@ class PanelController {
         const settings = await this.storageService.getSettings();
         this.openAIService = new OpenAIService(settings.apiKey);
         this.maxLength = settings.maxLength || DEFAULT_SETTINGS.MAX_LENGTH;
+        this.systemMessage = settings.systemMessage || '';
         await this.updateCurrentTab();
         await this.setupPromptButtons();
 
@@ -106,7 +108,7 @@ class PanelController {
             );
             const result = await this.openAIService.analyze(prompt, truncatedContent);
             this.elements.resultsContent.textContent = result;
-        } catch (error) {
+        } catch (error) {s
             this.showError(error.message);
         } finally {
             this.elements.loading.classList.add('hidden');

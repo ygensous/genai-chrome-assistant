@@ -15,6 +15,7 @@ class OptionsController {
     if (settings.apiKey) document.getElementById('apiKey').value = settings.apiKey;
     if (settings.model) document.getElementById('model').value = settings.model;
     if (settings.maxLength) document.getElementById('maxLength').value = settings.maxLength;
+    if (settings.systemMessage) document.getElementById('systemMessage').value = settings.systemMessage;
 
     // Set up prompts
     this.setupPrompts(settings.customPrompts || []);
@@ -74,6 +75,7 @@ class OptionsController {
         apiKey: document.getElementById('apiKey').value,
         model: document.getElementById('model').value,
         maxLength: parseInt(document.getElementById('maxLength').value, 10),
+        systemMessage: document.getElementById('systemMessage').value,
         customPrompts: this.getPrompts()
       };
 

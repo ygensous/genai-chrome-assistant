@@ -4,9 +4,13 @@ export class OpenAIService {
   constructor(apiKey) {
     this.apiKey = apiKey;
     this.apiUrl = 'https://api.openai.com/v1/chat/completions';
+    this.defaultSystemMessage = `I am [First Name Last Name - Email], [Job Title].
+Your responses should be professional, concise, and focused on providing actionable insights.
+When analyzing content, consider the technical and business implications.
+When suggesting email responses, maintain a professional yet approachable tone.`;
   }
 
-  async analyze(prompt, content) {
+  async analyze(prompt, content, systemMessage = '') {
     if (!this.apiKey) {
       throw new APIError('OpenAI API key is not set. Please set it in the extension options.');
     }
@@ -21,6 +25,10 @@ export class OpenAIService {
         body: JSON.stringify({
           model: 'gpt-3.5-turbo',
           messages: [
+            {
+              role: 'system',
+              content: systemMessage || this.defaultSystemMessage
+            },
             {
               role: 'user',
               content: `${prompt}\n\n${content}`
