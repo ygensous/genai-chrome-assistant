@@ -10,6 +10,7 @@ class PanelController {
         this.maxLength = DEFAULT_SETTINGS.MAX_LENGTH;
         this.currentUrl = '';
         this.systemMessage = '';
+        this.tabStates = new Map(); // Store states for each tab
         
         this.elements = {
             promptButtons: document.getElementById('prompt-buttons'),
@@ -34,12 +35,44 @@ class PanelController {
 
         this.elements.analyzeBtn.addEventListener('click', () => this.handleAnalyze());
         this.elements.copyButton.addEventListener('click', () => this.handleCopy());
+
+        // Save state when input changes
+        this.elements.analysisInput.addEventListener('input', () => this.saveCurrentTabState());
+    }
+
+    saveCurrentTabState() {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            if (tabs[0]?.id) {
+                this.tabStates.set(tabs[0].id, {
+                    prompt: this.elements.analysisInput.value,
+                    result: this.elements.resultsContent.textContent
+                });
+            }
+        });
+    }
+
+    restoreTabState(tabId) {
+        const state = this.tabStates.get(tabId);
+        if (state) {
+            this.elements.analysisInput.value = state.prompt || '';
+            this.elements.resultsContent.textContent = state.result || '';
+        } else {
+            this.elements.analysisInput.value = '';
+            this.elements.resultsContent.textContent = '';
+        }
     }
 
     setupTabChangeListener() {
         chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             if (request.action === 'tabChanged') {
-                this.updateCurrentTab().then(() => this.setupPromptButtons());
+                chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+                    if (tabs[0]?.id) {
+                        this.updateCurrentTab().then(() => {
+                            this.setupPromptButtons();
+                            this.restoreTabState(tabs[0].id);
+                        });
+                    }
+                });
             }
         });
     }
@@ -106,9 +139,10 @@ class PanelController {
                 JSON.stringify(content),
                 this.maxLength
             );
-            const result = await this.openAIService.analyze(prompt, truncatedContent);
+            const result = await this.openAIService.analyze(prompt, truncatedContent, this.systemMessage);
             this.elements.resultsContent.textContent = result;
-        } catch (error) {s
+            this.saveCurrentTabState(); // Save state after analysis
+        } catch (error) {
             this.showError(error.message);
         } finally {
             this.elements.loading.classList.add('hidden');

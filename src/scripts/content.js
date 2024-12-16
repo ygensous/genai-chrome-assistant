@@ -31,6 +31,12 @@
     }
 
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+        // Handle ping to check if content script is loaded
+        if (request.action === 'ping') {
+            sendResponse({ status: 'ok' });
+            return true;
+        }
+
         if (request.action === 'getContent') {
             try {
                 const content = contentExtractor.extractMainContent();

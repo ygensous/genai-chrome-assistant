@@ -49,7 +49,6 @@ Put quotes in blockquote format using.`,
       label: 'Suggest answer',
       prompt: `
       This is a gmail page. Suggest an answer to the email, in the language of the original email.
-      For context, I am yann.gensous@gmail.com
       `,
       urlPattern: 'https://mail.google.com/*'
     },{
