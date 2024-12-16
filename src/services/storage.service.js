@@ -1,7 +1,7 @@
 export class StorageService {
   constructor() {
     this.defaultPrompts = [{
-      label: 'Summarize content',
+      label: 'Summarize',
       prompt: `Please analyze and summarize this content in a structured format:
 
 1. Main Points (2-3 bullet points)
@@ -54,7 +54,7 @@ Put quotes in blockquote format using.`,
       `,
       urlPattern: 'https://mail.google.com/*'
     },{
-      label: 'Ask for update',
+      label: 'Ask update',
       prompt: `
       This is a gmail page. Suggest a message to ask for updates, in the language of the original email.
       `,

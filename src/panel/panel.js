@@ -54,8 +54,8 @@ class PanelController {
         const isGmail = this.currentUrl.includes('mail.google.com');
         this.elements.copyButton.innerHTML = isGmail 
             ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M4 12h14"/>
-                <path d="M13 5l7 7-7 7"/>
+                <path d="M20 12h-14"/>
+                <path d="M11 5l-7 7 7 7"/>
                </svg>`
             : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
